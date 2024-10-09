@@ -34,7 +34,7 @@ for match in possible_matches:
 
 # Real actual known matches
 known_matches = [
-    'd6756d8309907c3acde021b8cae3998c'
+    'd6756d8309907c3acde021b8cae3998c'     # Vickie's match
 ]
 
 # # test known matches
@@ -55,6 +55,8 @@ for match_encoded in known_matches:
 
 for giver in givers:
     recipient = random.choice(recipients)
+    while giver == recipient:
+        recipient = random.choice(recipients)
     recipients.remove(recipient)
     known_matches.append(md5(str((giver, recipient)).encode()).hexdigest())
 
