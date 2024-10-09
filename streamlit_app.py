@@ -24,11 +24,11 @@ for match in matches:
     hash = md5(str(match).encode()).hexdigest()
     matches_encoded[hash] = match
 
-if __name__ == '__main__':
-    st.title("🎁🎄Wilsterman Family Gift Fixer")
-    giver = st.selectbox(label='Giver', options=family)
-    recipient = st.selectbox(label='Recipient', options=family)
-    if giver == recipient:
-        st.error('Giver cannot be recipient')
-    else:
-        st.write(f'```\n{md5(str((giver, recipient)).encode()).hexdigest()}')
+
+st.title("🎁🎄Wilsterman Family Gift Fixer")
+giver = st.selectbox(label='Giver', options=family)
+recipient = st.selectbox(label='Recipient', options=family)
+if giver == recipient:
+    st.error('Giver cannot be recipient')
+else:
+    st.write(f'```\n{md5(str((giver, recipient)).encode()).hexdigest()}')
