@@ -3,7 +3,7 @@ import random
 import streamlit as st
 
 
-random.seed(4348)
+random.seed(1941)
 
 # Real actual family
 family = [
@@ -34,10 +34,10 @@ for match in possible_matches:
 
 # Real actual known matches
 known_matches = [
-    'd6756d8309907c3acde021b8cae3998c'      # Vickie's match
-    , '6e0e6f62753a0e4b27ed83f485c08c86'    # Annie's match
-    , '7df2b10c01c83f295cc461e3f141f084'    # Katie's match
-    , 'a0e524e4f3e0909edd3a62ed2d116fd4'    # Berto's match
+    # 'd6756d8309907c3acde021b8cae3998c'      # Vickie's match
+    # , '6e0e6f62753a0e4b27ed83f485c08c86'    # Annie's match
+    # , '7df2b10c01c83f295cc461e3f141f084'    # Katie's match
+    # , 'a0e524e4f3e0909edd3a62ed2d116fd4'    # Berto's match
 ]
 
 # # test known matches
@@ -64,7 +64,7 @@ for giver in givers:
     known_matches.append(md5(str((giver, recipient)).encode()).hexdigest())
 
 if __name__ == '__main__':
-    st.title("🎁🎄Wilsterman Family Gift Fixer")
+    st.title("🎁🎄Wilsterman Family Christmas Matcher")
 
     st.write('## Enter secret code here')
     with st.form('code_input'):
