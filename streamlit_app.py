@@ -3,7 +3,7 @@ import random
 import streamlit as st
 
 
-random.seed(1941)
+random.seed(646887542)
 
 # Real actual family
 family = [
