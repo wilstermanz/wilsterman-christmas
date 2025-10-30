@@ -5,10 +5,11 @@ import hashlib
 
 # Import from the actual app file for true testing (copy removed to avoid duplication issues)
 try:
-    from streamlit_app import generate_matches, family
+    from streamlit_app import generate_matches, family, SEED
 except ImportError as e:
     # Fallback if import fails
     print(f"Import failed: {e}. Using fallback.")
+    SEED = 777
     family = [
         'Tom',
         'Vickie',
@@ -59,7 +60,7 @@ if 'generate_matches' in globals():
 
 # Set up for setUp
 def import_logic():
-    known_matches, matches_encoded = generate_matches_fallback('1234567')
+    known_matches, matches_encoded = generate_matches_fallback(SEED)
     return family, known_matches, matches_encoded
 
 class TestSecretSanta(unittest.TestCase):

@@ -2,8 +2,8 @@ from hashlib import md5
 import random
 import streamlit as st
 
-
-random.seed('dingus')
+SEED = 777
+random.seed(SEED)
 
 # Real actual family
 family = [
@@ -57,14 +57,17 @@ def generate_matches(seed_string):
         recipients.remove(recipient)
 
     recipients_list = givers[:]  # copy the givers list
-    random.shuffle(recipients_list)  # shuffle for random matches without self
+    while True:
+        random.shuffle(recipients_list)  # shuffle for random matches
+        if not any(recipients_list[i] == giver for i, giver in enumerate(givers)):
+            break  # no self matches
     for i, giver in enumerate(givers):
         recipient = recipients_list[i]
         known_matches_local.append(md5(str((giver, recipient)).encode()).hexdigest())
 
     return known_matches_local, matches_encoded_local
 
-known_matches, matches_encoded = generate_matches('dingus')
+known_matches, matches_encoded = generate_matches(SEED)
 
 if __name__ == '__main__':
     st.title("🎄 Wilsterman Family Christmas Matcher 🎁❄️")
@@ -77,6 +80,7 @@ if __name__ == '__main__':
         submitted = st.form_submit_button("Reveal My Match! 🎁")
         if submitted and len(code) == 6:
             matched = False
+            code = code.lower()
             for match in known_matches:
                 if code == match[::6]:
                     st.success("Your Secret Santa match is **" + matches_encoded[match][1] + "**! 🎉")
