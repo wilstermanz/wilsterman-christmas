@@ -1,27 +1,27 @@
-# 🎅🎁🎄 Ho Ho Ho! Wilsterman Family Christmas Matcher ❄️🥳
+# 🎄 Wilsterman Family Christmas Matcher 🎁❄️
 
-**Deck the halls with Secret Santa love! 🎄** A jolly Secret Santa matching app for the Wilsterman family, built with Streamlit to spread holiday cheer and gift-giving magic! 🛷✨
+A Secret Santa matching app for the Wilsterman family, built with Streamlit.
 
-## 🎉 Festival of Fun Description
+## Description
 
-Dive into the yuletide spirit! This app magically generates unique Secret Santa matches for your family gift exchange. Each member gets a special 6-character secret code to unwrap their assigned recipient—keeping it all jolly and surprise-filled! 🎁🎉 Nothing like a dash of holiday mystery to make the season bright! ❄️🥁
+This app generates unique Secret Santa matches for family gift exchange. Each member gets a 6-character secret code to discover their assigned recipient—keeping it fun and surprising!
 
-## 🛷 How to Jingle Your Way to Running It
+## How to Run It
 
-1. **Install the holiday supplies** (requirements) 🛍️
+1. Install the requirements
 
    ```
    $ pip install -r requirements.txt
    ```
 
-2. **Launch the festive app!** 🎇
+2. Run the app
 
    ```
    $ streamlit run streamlit_app.py
    ```
 
-3. **Unwrap the magic!** 🏆 Enter your magical 6-character secret code to discover who you're gifting joy to this Christmas! 🎀❓
+3. Enter your 6-character secret code to find out who you're buying for!
 
-## 🎅 Santa's Secret Code Generator
+## Generating Codes
 
-Ho ho ho! Use the `get_secret_codes.ipynb` notebook (Santa's workshop tool) to generate and print those special secret codes for family distribution. It's the elf's secret helper to get the holiday ball rolling! 🎁📝
+Use the `get_secret_codes.ipynb` notebook to generate and print the secret codes for distribution.
