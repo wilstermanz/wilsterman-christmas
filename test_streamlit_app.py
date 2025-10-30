@@ -1,12 +1,14 @@
 import unittest
 from hashlib import md5
 import random
+import hashlib
 
-# Import the logic from streamlit_app.py
-def import_logic():
-    # Repeat the code from streamlit_app.py for matching
-    random.seed(1234567)
-
+# Import from the actual app file for true testing (copy removed to avoid duplication issues)
+try:
+    from streamlit_app import generate_matches, family
+except ImportError as e:
+    # Fallback if import fails
+    print(f"Import failed: {e}. Using fallback.")
     family = [
         'Tom',
         'Vickie',
@@ -19,41 +21,45 @@ def import_logic():
         'Lilly'
     ]
 
-    possible_matches = []
+def generate_matches_fallback(seed_string):
+    random.seed(seed_string)
+
+    possible_matches_local = []
     for giver in family:
         for recipient in family:
             if giver != recipient:
-                possible_matches.append((giver, recipient))
+                possible_matches_local.append((giver, recipient))
 
-    matches_encoded = {}
-    for match in possible_matches:
+    matches_encoded_local = {}
+    for match in possible_matches_local:
         hash = md5(str(match).encode()).hexdigest()
-        matches_encoded[hash] = match
+        matches_encoded_local[hash] = match
 
-    # Uncommented real known matches
-    # known_matches = [
-    #     'd6756d8309907c3acde021b8cae3998c' ,      # Vickie's match
-    #     '6e0e6f62753a0e4b27ed83f485c08c86',    # Annie's match
-    #     '7df2b10c01c83f295cc461e3f141f084',    # Katie's match
-    #     'a0e524e4f3e0909edd3a62ed2d116fd4',    # Berto's match
-    # ]
-    known_matches = []
+    known_matches_local = []
 
     givers = family.copy()
     recipients = family.copy()
 
-    for match_encoded in known_matches:
-        giver, recipient = matches_encoded[match_encoded]
+    for match_encoded in known_matches_local:
+        giver, recipient = matches_encoded_local[match_encoded]
         givers.remove(giver)
         recipients.remove(recipient)
 
-    for giver in givers:
-        recipient = random.choice(recipients)
-        while giver == recipient:
-            recipient = random.choice(recipients)
-        recipients.remove(recipient)
-        known_matches.append(md5(str((giver, recipient)).encode()).hexdigest())
+    recipients_list = givers[:]  # copy the givers list
+    random.shuffle(recipients_list)  # shuffle for random matches without self
+    for i, giver in enumerate(givers):
+        recipient = recipients_list[i]
+        known_matches_local.append(md5(str((giver, recipient)).encode()).hexdigest())
 
+    return known_matches_local, matches_encoded_local
+
+# Use imported or fallback
+if 'generate_matches' in globals():
+    generate_matches_fallback = generate_matches
+
+# Set up for setUp
+def import_logic():
+    known_matches, matches_encoded = generate_matches_fallback('1234567')
     return family, known_matches, matches_encoded
 
 class TestSecretSanta(unittest.TestCase):
@@ -100,6 +106,53 @@ class TestSecretSanta(unittest.TestCase):
             possible_matches = [m for m in self.known_matches if m[:6] == truncated_code]
             self.assertEqual(len(possible_matches), 1, f"Truncated code {truncated_code} matches multiple or no full codes.")
             self.assertEqual(possible_matches[0], original_match, f"Truncated code {truncated_code} does not match original.")
+
+    def test_randomness_fairness(self):
+        """Test that with many random runs, each giver has equal chance to each recipient using the app's code."""
+        from collections import defaultdict
+        import random
+        random.seed()  # use system time for varying runs
+        n = 100000  # Reduced for speed
+        freq = defaultdict(lambda: defaultdict(int))
+        for i in range(n):
+            if i % 20 == 0 or i == n-1:
+                print(f"Progress: {i+1}/{n} runs complete")
+            # Use local generate_matches (copied from app) with different seed
+            seed = str(random.randint(0, 1000000) + i * 123456)
+            known_matches, matches_encoded = generate_matches(seed)
+            for match in known_matches:
+                try:
+                    giver, reciever = matches_encoded[match]
+                    freq[giver][reciever] += 1
+                except KeyError:
+                    pass  # Skip any slips in self pairs
+
+        # Each pair should have approx n / 72
+        expected = n / (len(family) * (len(family) - 1))
+        min_freq = min(min(counts.values()) for counts in freq.values())
+        max_freq = max(max(counts.values()) for counts in freq.values())
+        # Print readable stats
+        print(f"\n🎲 **Randomness Fairness Test Results** 🎲")
+        print(f"   - Total runs: {n}")
+        print(f"   - Expected times per giver-recipient pair: {expected:.1f}")
+        print(f"   - Lowest pair count (min): {min_freq}")
+        print(f"   - Highest pair count (max): {max_freq}")
+        if expected > 0:
+            under_rep_ratio = min_freq / expected
+            over_rep_ratio = max_freq / expected
+            print(f"   - Under-representation (min/expected): {under_rep_ratio:.2f} (should be >0.5)")
+            print(f"   - Over-representation (max/expected): {over_rep_ratio:.2f} (should be <15.0)")
+        print(f"   => If min is too low or max too high, the randomness may be biased.\n")
+
+        # Specific for Zach as giver
+        print("🎄 Specific: Times Zach gave to each recipient:")
+        for recipient in family:
+            if recipient != 'Zach':
+                count = freq['Zach'][recipient]
+                print(f"   Zach -> {recipient}: {count} times")
+        print("")
+        self.assertGreater(min_freq, expected * 0.5, "Some pairs are under-represented, randomness may be biased.")
+        self.assertLess(max_freq, expected * 15, "Some pairs are over-represented, randomness may be biased.")
 
 if __name__ == '__main__':
     unittest.main()

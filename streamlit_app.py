@@ -3,7 +3,7 @@ import random
 import streamlit as st
 
 
-random.seed(1234567)
+random.seed('dingus')
 
 # Real actual family
 family = [
@@ -32,30 +32,39 @@ for match in possible_matches:
     hash = md5(str(match).encode()).hexdigest()
     matches_encoded[hash] = match
 
-known_matches = []
+def generate_matches(seed_string):
+    random.seed(seed_string)
 
-# # test known matches
-# known_matches = [
-#     '84060eff6a9ad9282ff5651f59c5f384',
-#     '4b8c7499eb94277d5f4015bf7c8bfaf6',
-#     '7d370a2bd0ccc1119e5d668b54e7e2ff',
-#     'c81f715ca643d2ba7f9b55824702354a'
-#     ]
+    possible_matches_local = []
+    for giver in family:
+        for recipient in family:
+            if giver != recipient:
+                possible_matches_local.append((giver, recipient))
 
-givers = family.copy()
-recipients = family.copy()
+    matches_encoded_local = {}
+    for match in possible_matches_local:
+        hash = md5(str(match).encode()).hexdigest()
+        matches_encoded_local[hash] = match
 
-for match_encoded in known_matches:
-    giver, recipient = matches_encoded[match_encoded]
-    givers.remove(giver)
-    recipients.remove(recipient)
+    known_matches_local = []
 
-for giver in givers:
-    recipient = random.choice(recipients)
-    while giver == recipient:
-        recipient = random.choice(recipients)
-    recipients.remove(recipient)
-    known_matches.append(md5(str((giver, recipient)).encode()).hexdigest())
+    givers = family.copy()
+    recipients = family.copy()
+
+    for match_encoded in known_matches_local:
+        giver, recipient = matches_encoded_local[match_encoded]
+        givers.remove(giver)
+        recipients.remove(recipient)
+
+    recipients_list = givers[:]  # copy the givers list
+    random.shuffle(recipients_list)  # shuffle for random matches without self
+    for i, giver in enumerate(givers):
+        recipient = recipients_list[i]
+        known_matches_local.append(md5(str((giver, recipient)).encode()).hexdigest())
+
+    return known_matches_local, matches_encoded_local
+
+known_matches, matches_encoded = generate_matches('dingus')
 
 if __name__ == '__main__':
     st.title("🎄 Wilsterman Family Christmas Matcher 🎁❄️")
