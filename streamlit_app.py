@@ -335,6 +335,19 @@ if __name__ == '__main__':
             opacity: 0;
         }
     }
+
+
+    </style>
+    """, unsafe_allow_html=True)
+
+    # Disable snow on mobile
+    st.markdown("""
+    <style>
+    @media (max-width: 767px) {
+        .snow-container {
+            display: none;
+        }
+    }
     </style>
     """, unsafe_allow_html=True)
 
